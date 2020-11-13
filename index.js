@@ -1,41 +1,20 @@
 const { ApolloServer } = require("apollo-server");
 const colors = require("colors");
-const gql = require("graphql-tag");
+
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 
-const Post = require("./models/postModel.js");
+const typeDefs = require("./graphql/typeDefs.js");
+const resolvers = require("./graphql/resolvers");
 
 dotenv.config();
 
-const typeDefs = gql`
-  type Post {
-    id: ID!
-    body: String!
-    createdAt: String!
-    username: String!
-  }
-  type Query {
-    getPosts: [Post]
-  }
-`;
 // ! means required
-const resolvers = {
-  Query: {
-    async getPosts() {
-      try {
-        const posts = await Post.find();
-        return posts;
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
-  },
-};
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req }) => ({ req }),
 });
 
 const PORT = process.env.PORT || 5000;
