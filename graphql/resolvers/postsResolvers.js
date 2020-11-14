@@ -28,11 +28,11 @@ module.exports = {
   },
   Mutation: {
     async createPost(_, { body }, context) {
-      console.log(context);
       const user = checkAuth(context);
-      console.log(user);
-
-      const newPost = new Post({
+      if (body.trim() === "") {
+        throw new Error("Post body must not be empty");
+      }
+      const newPost = await new Post({
         body,
         user: user.id,
         username: user.username,
@@ -40,6 +40,10 @@ module.exports = {
       });
 
       const post = await newPost.save();
+
+      context.pubsub.publish("NEW_POST", {
+        newPost: post,
+      });
 
       return post;
     },
@@ -56,6 +60,11 @@ module.exports = {
       } catch (error) {
         throw new Error(error);
       }
+    },
+  },
+  Subscription: {
+    newPost: {
+      subscribe: (_, __, { pubsub }) => pubsub.asyncIterator("NEW_POST"),
     },
   },
 };

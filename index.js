@@ -1,4 +1,4 @@
-const { ApolloServer } = require("apollo-server");
+const { ApolloServer, PubSub } = require("apollo-server");
 const colors = require("colors");
 
 const mongoose = require("mongoose");
@@ -8,13 +8,13 @@ const typeDefs = require("./graphql/typeDefs.js");
 const resolvers = require("./graphql/resolvers");
 
 dotenv.config();
-
+const pubsub = new PubSub();
 // ! means required
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ req }),
+  context: ({ req }) => ({ req, pubsub }),
 });
 
 const PORT = process.env.PORT || 5000;
