@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { Button, Form } from "semantic-ui-react";
@@ -49,7 +49,7 @@ const PostForm = () => {
       </Form>
       {/* {errors && <p style={{ color: "red" }}>{errors}</p>} */}
       {error && (
-        <div className="ui error message">
+        <div className="ui error message" style={{ marginBottom: 20 }}>
           <ul>
             <li>{error.graphQLErrors[0].message}</li>
           </ul>
