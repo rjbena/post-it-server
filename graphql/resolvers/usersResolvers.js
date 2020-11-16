@@ -22,10 +22,10 @@ function generateToken(user) {
 
 module.exports = {
   Mutation: {
-    async login(_, { username, password }, context, info) {
-      const { valid, errors } = validateLoginInput(username, password);
+    async login(_, { username, password }) {
+      const { errors, valid } = validateLoginInput(username, password);
       if (!valid) {
-        throw new UserInputError("Error", errors);
+        throw new UserInputError("Errors", { errors });
       }
       const user = await User.findOne({ username });
       if (!user) {
