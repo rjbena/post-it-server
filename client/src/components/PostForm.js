@@ -10,7 +10,7 @@ const PostForm = () => {
   const { values, onChange, onSubmit } = useForm(createPostCallback, {
     body: "",
   });
-  const [errors, setErrors] = useState("");
+
   const [createPost, { error }] = useMutation(CREATE_POST_MUTATION, {
     variables: values,
     update(proxy, result) {
@@ -24,9 +24,7 @@ const PostForm = () => {
       });
       values.body = "";
     },
-    onError(err) {
-      setErrors(err.graphQLErrors[0].extensions.exception.stacktrace[0]);
-    },
+    onError(err) {},
   });
 
   function createPostCallback() {
@@ -42,14 +40,21 @@ const PostForm = () => {
             name="body"
             onChange={onChange}
             value={values.body}
-            error={errors ? true : false}
+            error={error ? true : false}
           />
           <Button type="submit" color="teal">
             Submit
           </Button>
         </Form.Field>
       </Form>
-      {errors && <p style={{ color: "red" }}>{errors}</p>}
+      {/* {errors && <p style={{ color: "red" }}>{errors}</p>} */}
+      {error && (
+        <div className="ui error message">
+          <ul>
+            <li>{error.graphQLErrors[0].message}</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
