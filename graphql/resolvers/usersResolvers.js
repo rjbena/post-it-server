@@ -47,9 +47,7 @@ module.exports = {
     },
     async register(
       _,
-      { registerInput: { username, email, password, confirmPassword } },
-      context,
-      info
+      { registerInput: { username, email, password, confirmPassword } }
     ) {
       //  Validate user data
       const { valid, errors } = validateRegisterInput(
@@ -65,7 +63,7 @@ module.exports = {
       const user = await User.findOne({ username });
       if (user) {
         throw new UserInputError("Username is taken", {
-          username: "This username is taken",
+          errors: { username: "This username is taken" },
         });
       }
       //  hash password and create an auth token

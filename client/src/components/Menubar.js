@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Menu } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 const MenuBar = () => {
+  //console.log(window.location);
   const pathname = window.location.pathname;
+  //console.log(pathname);
   const path = pathname === "/" ? "home" : pathname.substr(1);
   const [activeItem, setActiveItem] = useState(path);
 
