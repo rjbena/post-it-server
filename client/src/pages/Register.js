@@ -8,7 +8,7 @@ import { useForm } from "../utils/hooks";
 
 const Register = ({ history }) => {
   const context = useContext(AuthContext);
-  const { user } = context;
+
   const initialState = {
     username: "",
     password: "",
