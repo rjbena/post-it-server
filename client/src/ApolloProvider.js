@@ -8,7 +8,7 @@ import { setContext } from "apollo-link-context";
 //Checkout apollo-boost
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:5000/",
+  uri: "https://post0it.herokuapp.com/",
 });
 
 const authLink = setContext(() => {

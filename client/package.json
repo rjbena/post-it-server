@@ -1,6 +1,7 @@
 {
   "name": "client",
   "version": "0.1.0",
+  "proxy": "https://post0it.herokuapp.com/",
   "private": true,
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
