@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import gql from "graphql-tag";
-import { useQuery } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import {
   Grid,
   Loader,
@@ -9,6 +9,7 @@ import {
   Button,
   Icon,
   Label,
+  Form,
 } from "semantic-ui-react";
 import moment from "moment";
 
@@ -20,6 +21,7 @@ const SinglePost = (props) => {
   const { user } = useContext(AuthContext);
   const postId = props.match.params.id;
 
+  const [comment, setComment] = useState("");
   const { data: { getPost } = {} } = useQuery(FETCH_POST_QUERY, {
     variables: { postId },
   });
@@ -27,6 +29,13 @@ const SinglePost = (props) => {
   function deletePostCallback() {
     props.history.push("/");
   }
+
+  const [submitComment] = useMutation(CREATE_COMMENT_MUTATION, {
+    update() {
+      setComment("");
+    },
+    variables: { postId, body: comment },
+  });
 
   let postMarkup;
   if (!getPost) {
@@ -54,30 +63,57 @@ const SinglePost = (props) => {
             />
           </Grid.Column>
           <Grid.Column width={10}>
-            <Card.Content>
-              <Card.Header>{username}</Card.Header>
-              <Card.Meta>{moment(createdAt).fromNow()}</Card.Meta>
-              <Card.Description>{body}</Card.Description>
-            </Card.Content>
-            <hr />
-            <Card.Content extra>
-              <LikeButton user={user} post={{ id, likeCount, likes }} />
-              <Button
-                as="div"
-                labelPosition="right"
-                onClick={() => console.log("comment")}
-              >
-                <Button basic color="blue">
-                  <Icon name="comments" />
+            <Card>
+              <Card.Content>
+                <Card.Header>{username}</Card.Header>
+                <Card.Meta>{moment(createdAt).fromNow()}</Card.Meta>
+                <Card.Description>{body}</Card.Description>
+              </Card.Content>
+              <hr />
+              <Card.Content extra>
+                <LikeButton user={user} post={{ id, likeCount, likes }} />
+                <Button
+                  as="div"
+                  labelPosition="right"
+                  onClick={() => console.log("comment")}
+                >
+                  <Button basic color="blue">
+                    <Icon name="comments" />
+                  </Button>
+                  <Label basic color="blue" pointing="left">
+                    {commentCount}
+                  </Label>
                 </Button>
-                <Label basic color="blue" pointing="left">
-                  {commentCount}
-                </Label>
-              </Button>
-              {user && user.username === username && (
-                <DeleteButton postId={id} callback={deletePostCallback} />
-              )}
-            </Card.Content>
+                {user && user.username === username && (
+                  <DeleteButton postId={id} callback={deletePostCallback} />
+                )}
+              </Card.Content>
+            </Card>
+            {user && (
+              <Card fluid>
+                <Card.Content>
+                  <p>Post a comment</p>
+                  <Form>
+                    <div className="ui action input fluid">
+                      <input
+                        type="text"
+                        placeholder="Comment.."
+                        onChange={(e) => setComment(e.target.value)}
+                        value={comment}
+                      />
+                      <button
+                        type="submit"
+                        className="ui button teal"
+                        disabled={comment.trim() === ""}
+                        onClick={submitComment}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </Form>
+                </Card.Content>
+              </Card>
+            )}
             {comments.map((comment) => (
               <Card fluid key={comment.id} className="comment-body">
                 <Card.Content>
@@ -118,6 +154,21 @@ const FETCH_POST_QUERY = gql`
         createdAt
         body
       }
+    }
+  }
+`;
+
+const CREATE_COMMENT_MUTATION = gql`
+  mutation createComment($postId: ID!, $body: String!) {
+    createComment(postId: $postId, body: $body) {
+      id
+      comments {
+        id
+        body
+        createdAt
+        username
+      }
+      commentCount
     }
   }
 `;
